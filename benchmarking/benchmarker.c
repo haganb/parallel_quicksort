@@ -1,13 +1,16 @@
 #include <time.h>
 #include <stdlib.h>
 
+#define SIZE 50
+#define SIZE_PRINT_LIMIT 100
+
 // For pretty printing
 #define ANSI_RED "\x1b[31m"
 #define ANSI_GREEN "\x1b[32m"
 #define ANSI_RESET "\x1b[0m"
 
 // get_cpu_benchmark: method to use radix sort on CPU and benchmark
-float get_cpu_benchmark(unsigned int *unsorted_matrix, int SIZE, int SIZE_PRINT_LIMIT){
+float get_cpu_benchmark(unsigned int *unsorted_matrix){
     // Set up benchmarking tools
     struct timeval begin;
     struct timeval end;
