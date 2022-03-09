@@ -1,4 +1,5 @@
 #include <sys/time.h>
+#include <pthread.h>
 #include "../helpers.c"
 
 #define DEBUG
@@ -11,8 +12,7 @@
 #define ANSI_GREEN "\x1b[32m"
 #define ANSI_RESET "\x1b[0m"
 
-/* SEQUENTIAL QUICKSORT METHODS */
-
+/* QUICKSORT METHODS */
 void swap_numbers(int* one, int* two){
     int temp = *one;
     *one = *two;
@@ -32,31 +32,29 @@ int partition(int* array, int low, int high){
     return i + 1;
 }
 
-void sequential_quicksort(int* array, int low, int high){
-    if(low < high){
-        int p = partition(array, low, high);
-        sequential_quicksort(array, low, p - 1);
-        sequential_quicksort(array, p +1, high);
-    }
+void pthread_quicksort(int* array){
+
 }
 
-/* BENCHMARKING FUNCTION */
-// get_cpu_benchmark: method to use radix sort on CPU and benchmark
-float get_cpu_benchmark(unsigned int *array){
-    // Set up benchmarking tools
+// Wrapper function for quicksort that handles pthreading
+void run_pthread_quicksort(int* array){
+
+}
+
+/* BENCHMARKING METHODS */
+float get_pthread_benchmark(unsigned int* array){
     struct timeval begin;
     struct timeval end;
+
     gettimeofday(&begin, NULL);
 
     // Actual sorting
-    sequential_quicksort(array, 0, SIZE - 1);
 
-    // Finish benchmarking
+    // Finish benchmarking and process
     gettimeofday(&end, NULL);
     float time = (float)((end.tv_usec - begin.tv_usec)) / 1000;
-    printf("Elapsed time for sequential sorting (ms): %f\n", time);
+    printf("Elapsed time for PTHREAD concurrent sorting (ms): %f\n", time);
 
-    // Ensure that device is properly sorted
     if(check_if_sorted(array, SIZE)){
         printf("Matrix was sorted ");
         printf(ANSI_GREEN "successfully." ANSI_RESET "\n");
@@ -82,14 +80,13 @@ float get_cpu_benchmark(unsigned int *array){
     return time;
 }
 
-/* MAIN */
 
+/* MAIN METHOD */
 int main(){
-    printf("Sorting array with %d elements in sequence...\n", SIZE);
-
+    printf("Sorting array with %d elements using PTHREADS...\n", SIZE);
     unsigned int* array = (int*) malloc(sizeof(int) * SIZE);
     init_matrix(array, SIZE);
 
-    float sequential_time = get_cpu_benchmark(array);
+    
     return 0;
 }
