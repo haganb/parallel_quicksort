@@ -12,6 +12,14 @@
 #define ANSI_GREEN "\x1b[32m"
 #define ANSI_RESET "\x1b[0m"
 
+/* QUICKSORT PARAMETER STRUCT */
+typedef struct quicksort_params{
+    int* array;
+    int high;
+    int low;
+    int threadDepth;
+} quicksort_params;
+
 /* QUICKSORT METHODS */
 void swap_numbers(int* one, int* two){
     int temp = *one;
@@ -19,26 +27,67 @@ void swap_numbers(int* one, int* two){
     *two = temp;
 }
 
-int partition(int* array, int low, int high){
-    int pivot = array[high];
-    int i = low - 1;
-    for(int j = low; j <= high - 1; j++){
-        if(array[j] <= pivot){
-            i++;
-            swap_numbers(&array[i], &array[j]);
+int partition(int* array, int low, int high, int pivot){
+    int new_pivot = array[pivot];
+    swap_numbers(&array[pivot], &array[high]);
+    int s = low;
+
+    for(int i = low; i < high; i++){
+        if(array[i] <= new_pivot){
+            swap_numbers(&array[i], &array[s]);
         }
     }
-    swap_numbers(&array[i+1], &array[high]);
-    return i + 1;
+    swap_numbers(&array[s], &array[high]);
+    return s;
 }
 
-void pthread_quicksort(int* array){
 
+
+void quickSort(int *arr, int low, int high)
+{
+	if (low < high)
+	{
+    int pivotPosition = low+ (high-low)/2;
+    pivotPosition= partition(arr, low, high, pivotPosition);
+		quickSort(arr, low, pivotPosition - 1);
+		quickSort(arr, pivotPosition + 1, high);
+	}
+}
+
+void pthread_quicksort(int* array, int low, int high, int threadDepth); // declare before define for pthread
+void* thread_quicksort_utility(void* values){
+    quicksort_params* params = values;
+    pthread_quicksort(params->array, params->low, params->high, params->threadDepth);
+    return NULL;
 }
 
 // Wrapper function for quicksort that handles pthreading
-void run_pthread_quicksort(int* array){
+void pthread_quicksort(int* array, int low, int high, int threadDepth){
+    if(low < high){
+        int pivot = partition(array, low, high, low + (high-low) / 2);
+        pthread_t thread;
 
+        if(threadDepth > 0){
+            quicksort_params params = {array, low, pivot - 1, threadDepth};
+            int result;
+            result = pthread_create(&thread, NULL, thread_quicksort_utility, &params);
+            pthread_quicksort(array, pivot + 1, high, threadDepth);
+            pthread_join(thread, NULL);
+        }else{
+            quickSort(array, low, pivot - 1);
+            quickSort(array, pivot + 1, high);
+        }
+    }
+}
+
+void pthread_quicksort_wrapper(unsigned int* array){
+    int threadDepth = 4;
+    pthread_quicksort(array, 0, SIZE - 1, threadDepth);
+    if(check_if_sorted(array, SIZE)){
+        printf("Success!");
+    }else{
+        printf("Failed!");
+    }
 }
 
 /* BENCHMARKING METHODS */
@@ -50,6 +99,7 @@ float get_pthread_benchmark(unsigned int* array){
 
     // Actual sorting
 
+
     // Finish benchmarking and process
     gettimeofday(&end, NULL);
     float time = (float)((end.tv_usec - begin.tv_usec)) / 1000;
@@ -58,7 +108,7 @@ float get_pthread_benchmark(unsigned int* array){
     if(check_if_sorted(array, SIZE)){
         printf("Matrix was sorted ");
         printf(ANSI_GREEN "successfully." ANSI_RESET "\n");
-        
+
         #ifdef DEBUG
         if(SIZE < SIZE_PRINT_LIMIT){
             printf("Good sort: ");
@@ -86,7 +136,8 @@ int main(){
     printf("Sorting array with %d elements using PTHREADS...\n", SIZE);
     unsigned int* array = (int*) malloc(sizeof(int) * SIZE);
     init_matrix(array, SIZE);
+    pthread_quicksort_wrapper(array);
 
-    
+
     return 0;
 }
