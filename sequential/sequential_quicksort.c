@@ -3,7 +3,7 @@
 
 #define DEBUG
 
-#define SIZE 50
+#define SIZE 5000
 #define SIZE_PRINT_LIMIT 100
 
 // For pretty printing
@@ -91,5 +91,6 @@ int main(){
     init_matrix(array, SIZE);
 
     float sequential_time = get_cpu_benchmark(array);
+    free(array);
     return 0;
 }
