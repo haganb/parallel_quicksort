@@ -1,17 +1,18 @@
 #include <sys/time.h>
+#include <omp.h>
 #include "../helpers.c"
 
 #define DEBUG
-
 #define SIZE 500000
 #define SIZE_PRINT_LIMIT 100
+#define THREAD_COUNT 8
 
 // For pretty printing
 #define ANSI_RED "\x1b[31m"
 #define ANSI_GREEN "\x1b[32m"
 #define ANSI_RESET "\x1b[0m"
 
-/* SEQUENTIAL QUICKSORT METHODS */
+/* QUICKSORT HELPER METHODS */
 
 void swap_numbers(int* one, int* two){
     int temp = *one;
@@ -32,35 +33,57 @@ int partition(int* array, int low, int high){
     return i + 1;
 }
 
-void sequential_quicksort(int* array, int low, int high){
+void omp_quicksort(unsigned int* array, int low, int high){
     if(low < high){
-        int p = partition(array, low, high);
-        sequential_quicksort(array, low, p - 1);
-        sequential_quicksort(array, p +1, high);
+        int partition_value = partition(array, low, high);
+        #pragma omp task firstprivate(array, low, partition_value)
+        {
+            omp_quicksort(array, low, partition_value - 1);
+        }
+        {
+            omp_quicksort(array, partition_value + 1, high);
+        }
     }
 }
 
-/* BENCHMARKING FUNCTION */
-// get_cpu_benchmark: method to use radix sort on CPU and benchmark
-float get_cpu_benchmark(unsigned int *array){
-    // Set up benchmarking tools
+void run_omp_quicksort(unsigned int* array){
+    omp_set_num_threads(THREAD_COUNT);
+    #pragma omp parallel
+    {
+        int id = omp_get_thread_num();
+        int num_threads = omp_get_num_threads();
+
+        #pragma omp single nowait
+        omp_quicksort(array, 0, SIZE - 1);
+    }
+    
+}
+
+float get_omp_benchmark(unsigned int* array){
+    #ifdef DEBUG
+        if(SIZE < SIZE_PRINT_LIMIT){
+            printf("Array prior to sorting: ");
+            print_matrix(array, SIZE);
+        }
+    #endif
+    
     struct timeval begin;
     struct timeval end;
+
     gettimeofday(&begin, NULL);
 
     // Actual sorting
-    sequential_quicksort(array, 0, SIZE - 1);
+    run_omp_quicksort(array);
 
-    // Finish benchmarking
+    // Finish benchmarking and process
     gettimeofday(&end, NULL);
     float time = (float)((end.tv_usec - begin.tv_usec)) / 1000;
-    printf("Elapsed time for sequential sorting (ms): %f\n", time);
+    printf("Elapsed time for PTHREAD concurrent sorting (ms): %f\n", time);
 
-    // Ensure that device is properly sorted
     if(check_if_sorted(array, SIZE)){
         printf("Matrix was sorted ");
         printf(ANSI_GREEN "successfully." ANSI_RESET "\n");
-        
+
         #ifdef DEBUG
         if(SIZE < SIZE_PRINT_LIMIT){
             printf("Good sort: ");
@@ -78,19 +101,16 @@ float get_cpu_benchmark(unsigned int *array){
         }
         #endif
     }
-    printf("\n");
     return time;
 }
 
-/* MAIN */
 
 int main(){
-    printf("Sorting array with %d elements in sequence...\n", SIZE);
-
+    printf("Sorting array with %d elements using OpenMP...\n", SIZE);
+    // Create array to be sorted
     unsigned int* array = (int*) malloc(sizeof(int) * SIZE);
     init_matrix(array, SIZE);
-
-    float sequential_time = get_cpu_benchmark(array);
+    float benchmark = get_omp_benchmark(array);
     free(array);
     return 0;
 }

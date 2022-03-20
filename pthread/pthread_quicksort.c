@@ -3,7 +3,7 @@
 #include "../helpers.c"
 
 #define DEBUG
-#define SIZE 5000
+#define SIZE 500000
 #define SIZE_PRINT_LIMIT 100
 
 // For pretty printing
