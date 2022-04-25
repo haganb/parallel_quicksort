@@ -1,8 +1,5 @@
-#include <sys/time.h>
-#include "../helpers.c"
-
+#include "sequential_quicksort.h"
 #define DEBUG
-
 #define SIZE 500000
 #define SIZE_PRINT_LIMIT 100
 
@@ -12,7 +9,6 @@
 #define ANSI_RESET "\x1b[0m"
 
 /* SEQUENTIAL QUICKSORT METHODS */
-
 void swap_numbers(int* one, int* two){
     int temp = *one;
     *one = *two;
@@ -60,7 +56,7 @@ float get_cpu_benchmark(unsigned int *array){
     if(check_if_sorted(array, SIZE)){
         printf("Matrix was sorted ");
         printf(ANSI_GREEN "successfully." ANSI_RESET "\n");
-        
+
         #ifdef DEBUG
         if(SIZE < SIZE_PRINT_LIMIT){
             printf("Good sort: ");
@@ -83,7 +79,6 @@ float get_cpu_benchmark(unsigned int *array){
 }
 
 /* MAIN */
-
 int main(){
     printf("Sorting array with %d elements in sequence...\n", SIZE);
 

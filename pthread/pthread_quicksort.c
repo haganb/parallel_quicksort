@@ -1,6 +1,4 @@
-#include <sys/time.h>
-#include <pthread.h>
-#include "../helpers.c"
+#include "pthread_quicksort.h"
 
 #define DEBUG
 #define SIZE 500000
@@ -17,12 +15,7 @@ int THREAD_COUNT = 0;
 // function needs to be declared for pthread
 void parallel_quicksort(int *array, int low, int high);
 
-/* QUICKSORT PARAMETER STRUCT */
-struct quicksort_params{
-  int *array;
-  int low;
-  int high;
-} quicksort_params;
+
 
 /* QUICKSORT METHODS */
 
@@ -34,15 +27,14 @@ void swap_numbers(int* one, int* two){
 }
 
 // Helper function to partition array and swap relevant values
-int partition (int *array, int low, int high, int pivot)
-{
+int pivot_partition(int *array, int low, int high, int pivot){
 	int pivot_value = array[pivot];
-    swap_numbers(&array[pivot], &array[high]); 
-	int s = low; 
+    swap_numbers(&array[pivot], &array[high]);
+	int s = low;
 	for (int i = low; i < high; i++){
 		if (array[i] <= pivot_value){
 			swap_numbers(&array[i], &array[s]);
-            s++; 
+            s++;
 		}
 	}
 	swap_numbers(&array[s], &array[high]);
@@ -61,7 +53,7 @@ void parallel_quicksort(int *array, int low, int high){
     if (low < high){
         THREAD_COUNT++; // keep track of how many threads are spawned
         int pivot_position = low + (high - low) / 2;
-        pivot_position = partition(array, low, high, pivot_position);
+        pivot_position = pivot_partition(array, low, high, pivot_position);
         pthread_t thread;
         struct quicksort_params thread_parameters = {array, low, pivot_position - 1};
         int thread_create = pthread_create(&thread, NULL, quicksort_thread_utility, &thread_parameters);
@@ -79,7 +71,7 @@ float get_pthread_benchmark(unsigned int* array){
             print_matrix(array, SIZE);
         }
     #endif
-    
+
     struct timeval begin;
     struct timeval end;
 

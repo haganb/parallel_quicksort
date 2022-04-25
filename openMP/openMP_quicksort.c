@@ -1,6 +1,4 @@
-#include <sys/time.h>
-#include <omp.h>
-#include "../helpers.c"
+#include "openmp_quicksort.h"
 
 #define DEBUG
 #define SIZE 500000
@@ -56,7 +54,7 @@ void run_omp_quicksort(unsigned int* array){
         #pragma omp single nowait
         omp_quicksort(array, 0, SIZE - 1);
     }
-    
+
 }
 
 float get_omp_benchmark(unsigned int* array){
@@ -66,7 +64,7 @@ float get_omp_benchmark(unsigned int* array){
             print_matrix(array, SIZE);
         }
     #endif
-    
+
     struct timeval begin;
     struct timeval end;
 

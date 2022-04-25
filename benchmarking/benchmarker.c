@@ -1,8 +1,6 @@
-
-#include "../helpers.c"
-#include "../openMP/openMP_quicksort.c"
-#include "../sequential/sequential_quicksort.c"
-#include "../pthread/pthread_quicksort.c"
+#include "../openMP/openMP_quicksort.h"
+#include "../sequential/sequential_quicksort.h"
+#include "../pthread/pthread_quicksort.h"
 
 #ifdef SIZE
 #define SIZE 5000000

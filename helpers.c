@@ -1,8 +1,4 @@
-#include <stdio.h>
-#include <time.h>
-#include <stdlib.h>
-#include <stdbool.h>
-
+#include "helpers.h"
 // init_matrix: Method used to populate matrix with randomized values
 void init_matrix(unsigned int* matrix, int N){
     srand(time(NULL));
