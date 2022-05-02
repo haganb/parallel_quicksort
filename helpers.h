@@ -6,9 +6,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-void init_matrix(unsigned int* array, int SIZE);
+void init_array(unsigned int* array, int SIZE);
 void swap_numbers(int* one, int* two);
 bool check_if_sorted(unsigned int* array, int SIZE);
-void print_matrix(unsigned int* array, int SIZE);
+void print_array(unsigned int* array, int SIZE);
 
 #endif

@@ -1,6 +1,4 @@
 #include "pthread_quicksort.h"
-
-#define DEBUG
 #define SIZE_PRINT_LIMIT 100
 
 // For pretty printing
@@ -55,46 +53,29 @@ void parallel_quicksort(int *array, int low, int high){
 /* BENCHMARKING METHOD */
 // Returns actual float in case method needs to be called from other file
 float get_pthread_benchmark(unsigned int* array, int SIZE){
-    #ifdef DEBUG
-        if(SIZE < SIZE_PRINT_LIMIT){
-            printf("Array prior to sorting: ");
-            print_matrix(array, SIZE);
-        }
-    #endif
+    // struct timeval begin;
+    // struct timeval end;
+    struct timespec begin;
+    struct timespec end;
 
-    struct timeval begin;
-    struct timeval end;
-
-    gettimeofday(&begin, NULL);
-
+    // gettimeofday(&begin, NULL);
+    clock_gettime(CLOCK_MONOTONIC, &begin);
     // Actual sorting
     parallel_quicksort(array, 0, SIZE - 1);
 
     // Finish benchmarking and process
-    gettimeofday(&end, NULL);
-    float time = (float)((end.tv_usec - begin.tv_usec)) / 1000;
-    printf("Elapsed time for PTHREAD concurrent sorting (ms): %f\n", time);
+    // gettimeofday(&end, NULL);
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    double time = end.tv_sec - begin.tv_sec;
+    time += (end.tv_nsec - begin.tv_nsec) / 1000000000.0;
+    printf("Elapsed time for PTHREAD concurrent sorting: %lf second(s)\n", time);
 
     if(check_if_sorted(array, SIZE)){
-        printf("Matrix was sorted ");
+        printf("Array was sorted ");
         printf(ANSI_GREEN "successfully." ANSI_RESET "\n");
-
-        #ifdef DEBUG
-        if(SIZE < SIZE_PRINT_LIMIT){
-            printf("Good sort: ");
-            print_matrix(array, SIZE);
-        }
-        #endif
     }else{
-        printf("ERROR: Matrix sorting ");
+        printf("ERROR: Array sorting ");
         printf(ANSI_RED "failed." ANSI_RESET "\n");
-
-        #ifdef DEBUG
-        if(SIZE < SIZE_PRINT_LIMIT){
-            printf("Bad sort: ");
-            print_matrix(array, SIZE);
-        }
-        #endif
     }
     printf("Total number of threads spawned: %d\n", THREAD_COUNT);
     printf("\n");

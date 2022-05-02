@@ -34,37 +34,42 @@ void sequential_quicksort(int* array, int low, int high){
 // get_cpu_benchmark: method to use radix sort on CPU and benchmark
 float get_cpu_benchmark(unsigned int *array, int SIZE){
     // Set up benchmarking tools
-    struct timeval begin;
-    struct timeval end;
-    gettimeofday(&begin, NULL);
-
+    // struct timeval begin;
+    // struct timeval end;
+    // gettimeofday(&begin, NULL);
+    struct timespec begin;
+    struct timespec end;
+    clock_gettime(CLOCK_MONOTONIC, &begin);
     // Actual sorting
     sequential_quicksort(array, 0, SIZE - 1);
 
     // Finish benchmarking
-    gettimeofday(&end, NULL);
-    float time = (float)((end.tv_usec - begin.tv_usec)) / 1000;
-    printf("Elapsed time for sequential sorting (ms): %f\n", time);
+    // gettimeofday(&end, NULL);
+    // float time = (float)((end.tv_usec - begin.tv_usec)) / 1000;
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    double time = end.tv_sec - begin.tv_sec;
+    time += (end.tv_nsec - begin.tv_nsec) / 1000000000.0;
+    printf("Elapsed time for sequential sorting: %lf second(s)\n", time);
 
     // Ensure that device is properly sorted
     if(check_if_sorted(array, SIZE)){
-        printf("Matrix was sorted ");
+        printf("Array was sorted ");
         printf(ANSI_GREEN "successfully." ANSI_RESET "\n");
 
         #ifdef DEBUG
         if(SIZE < SIZE_PRINT_LIMIT){
             printf("Good sort: ");
-            print_matrix(array, SIZE);
+            print_array(array, SIZE);
         }
         #endif
     }else{
-        printf("ERROR: Matrix sorting ");
+        printf("ERROR: Array sorting ");
         printf(ANSI_RED "failed." ANSI_RESET "\n");
 
         #ifdef DEBUG
         if(SIZE < SIZE_PRINT_LIMIT){
             printf("Bad sort: ");
-            print_matrix(array, SIZE);
+            print_array(array, SIZE);
         }
         #endif
     }
