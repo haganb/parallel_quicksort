@@ -50,50 +50,22 @@ void run_omp_quicksort(unsigned int* array, int SIZE){
 }
 
 float get_omp_benchmark(unsigned int* array, int SIZE){
-    #ifdef DEBUG
-        if(SIZE < SIZE_PRINT_LIMIT){
-            printf("Array prior to sorting: ");
-            print_array(array, SIZE);
-        }
-    #endif
-
-    // struct timeval begin;
-    // struct timeval end;
-
-    // gettimeofday(&begin, NULL);
     double begin = omp_get_wtime();
 
     // Actual sorting
     run_omp_quicksort(array, SIZE);
 
     // Finish benchmarking and process
-    // gettimeofday(&end, NULL);
-    //float time = (float)((end.tv_usec - begin.tv_usec)) / 1000;
-
     double time = omp_get_wtime() - begin;
     printf("Elapsed time for OpenMP concurrent sorting: %f second(s)\n", time);
     printf("Number of threads: %d\n", THREAD_COUNT);
     if(check_if_sorted(array, SIZE)){
         printf("Array was sorted ");
         printf(ANSI_GREEN "successfully." ANSI_RESET "\n");
-
-        #ifdef DEBUG
-        if(SIZE < SIZE_PRINT_LIMIT){
-            printf("Good sort: ");
-            print_array(array, SIZE);
-        }
-        #endif
     }else{
         printf("ERROR: Array sorting ");
         printf(ANSI_RED "failed." ANSI_RESET "\n");
-
-        #ifdef DEBUG
-        if(SIZE < SIZE_PRINT_LIMIT){
-            printf("Bad sort: ");
-            print_array(array, SIZE);
-        }
-        #endif
-    }
+    } 
     printf("\n");
     return time;
 }

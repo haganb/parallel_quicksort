@@ -8,7 +8,7 @@
 #define ANSI_RESET "\x1b[0m"
 
 // Global Variables
-int SIZE = 10000;
+int SIZE = 50000;
 int PRINT_SIZE_LIMIT = 100; // the maximum number of elements an array can have while still being allowed to print
 
 void compare_results(float sequential, float pthread, float omp){
